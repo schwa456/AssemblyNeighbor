@@ -6,43 +6,38 @@ def get_data():
     df = pd.read_excel(file_path)
     return df
 
-def get_members(df):
-    members = []
+def get_members_df(df):
+    members = {}
     for _, row in df.iterrows():
-        member = AssemblyMember(row['의원'], row['정당'])
-        print(member.name)
-        if member not in members:
-            members.append(member)
-    return members
+        members[row['의원']] = row['정당']
 
-def get_parties(df):
-    parties = []
-    for _, row in df.iterrows():
-        party = Party(row['정당'])
-        print(party.name)
-        if party not in parties:
-            parties.append(party)
-    return parties
+    members_df = pd.DataFrame.from_dict(members, orient='index', columns=['party'])
 
-def get_agendas(df):
-    agendas = []
+    members_df.reset_index(inplace=True)
+    members_df.rename(columns={'index' : 'name'}, inplace=True)
+
+    return members_df
+
+def get_agendas_df(df):
+    agendas = {}
     for _, row in df.iterrows():
-        agenda = Agenda(row['의안명'], row['의안번호'], row['의안URL'])
-        print(agenda.name)
-        if agenda not in agendas:
-            agendas.append(agenda)
-    return agendas
+        agendas[row['의안명']] = [row['의안번호'], row['의안URL']]
+
+    agendas_df = pd.DataFrame.from_dict(agendas, orient='index', columns=['agenda_id', 'agenda_url'])
+    agendas_df.reset_index(inplace=True)
+    agendas_df.rename(columns={'index' : 'agenda_name'}, inplace=True)
+
+    return agendas_df
 
 def __main__():
     df = get_data()
-    members = get_members(df)
-    for i in range(len(members)):
-        print(members[i].name, members[i].party)
-    parties = get_parties(df)
-    for i in range(len(parties)):
-        print(parties[i].name)
-    agendas = get_agendas(df)
-    for i in range(len(agendas)):
-        print(agendas[i].name)
+    members_df = get_members_df(df)
+    print(members_df)
+    members_df.to_csv('../data/members.csv')
+
+    agendas_df = get_agendas_df(df)
+    print(agendas_df)
+    agendas_df.to_csv('../data/agendas.csv')
+
 if __name__ == '__main__':
     __main__()

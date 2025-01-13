@@ -4,19 +4,10 @@ class AssemblyMember:
         self.party = party
         self.vote = []
 
-    def vote_to_agenda(self, agenda, vote):
-        self.vote.append(vote)
-        if vote == '찬성':
-            agenda.agree_members.append(self)
-        elif vote == '반대':
-            agenda.disagree_members.append(self)
-        elif vote == '기권':
-            agenda.giveup_members.append(self)
-
 class Agenda:
-    def __init__(self, name, number, url):
+    def __init__(self, name, id, url):
         self.name = name
-        self.number = number
+        self.id = id
         self.url = url
         self.agree_members = []
         self.disagree_members = []
