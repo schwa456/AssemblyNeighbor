@@ -6,49 +6,6 @@ import dash_daq as daq
 import webbrowser
 import os
 
-class Visualizer:
-    def __init__(self, embedding, metadata):
-        self.embedding = embedding
-        self.metadata = metadata
-
-    def plot(self, title='Visualization of Lawmakers Voting Embeddings'):
-        df = pd.DataFrame(self.embedding, columns=['Dim1', 'Dim2'])
-        df['name'] = self.metadata.index
-        df['party'] = self.metadata['정당'].values
-
-        color_discrete_map = {
-            '더불어민주당' : '#000dff',
-            '국민의힘' : '#E61E2B',
-            '정의당' : '#ffed00',
-            '진보당': '#d6001C',
-            '개혁신당': '#ff4d00',
-            '조국혁신당': '#06275e',
-            '사회민주당': '#f58400',
-            '기본소득당': '#00D2C3',
-            '무소속': 'grey',
-        }
-
-        fig = px.scatter(df, x='Dim1', y='Dim2', color='party', text='name',
-                         title=title, labels={'party': 'Political Party'},
-                         color_discrete_map=color_discrete_map)
-        fig.update_layout(
-            dragmode='zoom',
-            hovermode='closest',
-            showlegend=True,
-            legend_title='Political Party',
-            updatemenus=[
-                {
-                    "buttons": [
-                        {"label": "Show Names", "method": "update", "args": [{"text": [df['name']]}]},
-                        {"label": "Hide Names", "method": "update", "args": [{"text": [None]}]}
-                    ],
-                    "direction": "down",
-                    "showactive": True
-                }
-            ]
-        )
-        fig.show()
-
 if __name__ == '__main__':
     app = dash.Dash(__name__)
 
@@ -68,25 +25,34 @@ if __name__ == '__main__':
 
     # Dash Layout Setting
     app.layout = html.Div([
-        html.H1("제22대 국회 본회의 안건 투표에 따른 국회의원 유사도"),
-        html.Label("국회의원 이름 검색:"),
+        html.H1("제22대 국회 본회의 안건 투표에 따른 국회의원 유사도", style={'textAlign': 'center'}),
+        html.Label("국회의원 이름 검색:", style={'margin': '10px 0'}),
         dcc.Input(
             id='search-input',
             type='text',
             placeholder='이름을 입력하세요',
-            debounce=True
+            debounce=True,
+            style={'width' : '100%', 'padding': '10px', 'margin-bottom' : '20px'},
         ),
-        dcc.Graph(id='scatter-plot'),
+        dcc.Graph(id='scatter-plot',
+                  style={
+                      'width': '100%',
+                      'height': '100%',
+                      'maxWidth': '600px',
+                      'margin': '0 auto',
+                  }),
         daq.BooleanSwitch(
             id='toggle-text',
             on=True,
             label='이름 보이기',
-            labelPosition='top'
+            labelPosition='top',
+            style={'margin': '20px 0', 'textAlign': 'center'},
         ),
         dcc.Location(id='url', refresh=True),  # 리디렉션을 위한 Location 컴포넌트
         html.Div(id='link', style={'margin-top': '20px'})  # 동적 링크 표시
     ])
 
+    # Plotly 그래프 업데이트 콜백
     @app.callback(
         Output('scatter-plot', 'figure'),
         [Input('toggle-text', 'on'),
@@ -140,12 +106,34 @@ if __name__ == '__main__':
             textposition='top center' if show_text else None,
         )
         fig.update_layout(
+            autosize=True,
+            margin=dict(l=10, r=10, t=30, b=10),
+            height=400,
+            hoverlabel=dict(
+                font_size=12,
+                bgcolor='white',
+            ),
             xaxis_title="X축",
             yaxis_title="Y축",
             legend_title="정당",
             hovermode='closest'
         )
         return fig
+
+    # Viewport 메타 태그 추가
+    app.index_string = '''
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Mobile Optimized Scatter Plot</title>
+        </head>
+        <body>
+            {%app_entry%}
+            <footer>{%config%}{%scripts%}</footer>
+        </body>
+    </html>
+    '''
 
     """
     @app.callback(
