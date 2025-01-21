@@ -66,7 +66,7 @@ if __name__ == '__main__':
             - 검색창 입력 시 철자가 정확해야 검색결과가 표시됩니다.
             - 태블릿 환경에서는 화면을 가로로 회전하면 더 편하게 보실 수 있습니다.
             
-            ##### (아무도 보지 않을) 분석 방법
+            #### (아무도 보지 않을) 분석 방법
             1. 제22대 국회 본회의 안건별 국회의원의 표결 결과 수집
             2. tSNE 기법을 활용하여 2차원으로 표현
             3. 소속 정당별로 색을 변경하여 표현
@@ -120,7 +120,7 @@ if __name__ == '__main__':
             color='party',
             opacity=df['opacity'],
             color_discrete_map=color_discrete_map,
-            title="제22대 국회의원 성향 지형"
+            title="제22대 국회 의견 지형"
         )
 
         for i, trace in enumerate(fig.data):
@@ -174,7 +174,7 @@ if __name__ == '__main__':
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Mobile Optimized Scatter Plot</title>
+            <title>제22대 국회 의견 지형</title>
             {%metas%}
             {%css%}
         </head>
