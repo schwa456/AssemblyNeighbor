@@ -6,6 +6,7 @@ import dash
 from dash import dcc, html, Input, Output, State
 import dash_daq as daq
 import webbrowser
+import os
 
 class VotingData:
     def __init__(self, file_path):
@@ -214,5 +215,5 @@ if __name__ == '__main__':
             return html.A(f"Go to {lawmaker_name}'s page", href=url, target='_blank')
         return "Click on a point to view details."
 
-
-    app.run_server(debug=True)
+    port = int(os.environ.get('PORT', 10000))
+    app.run_server(host='0.0.0.0', port=port, debug=True)
