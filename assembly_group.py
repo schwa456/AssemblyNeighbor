@@ -3,8 +3,9 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import plotly.express as px
 import dash
-from dash import dcc, html, Input, Output
+from dash import dcc, html, Input, Output, State
 import dash_daq as daq
+import webbrowser
 
 class VotingData:
     def __init__(self, file_path):
@@ -111,7 +112,7 @@ if __name__ == '__main__':
         '개혁신당': '#ff4d00',
         '조국혁신당': '#06275e',
         '사회민주당': '#f58400',
-        '기본소득당': '#008B7E',
+        '기본소득당': '#03fceb',
         '무소속': 'grey',
     }
 
@@ -133,7 +134,9 @@ if __name__ == '__main__':
             on=True,
             label='Show Text',
             labelPosition='top'
-        )
+        ),
+        dcc.Location(id='url', refresh=True),  # 리디렉션을 위한 Location 컴포넌트
+        html.Div(id='link', style={'margin-top': '20px'})  # 동적 링크 표시
     ])
 
     @app.callback(
@@ -195,5 +198,21 @@ if __name__ == '__main__':
             hovermode='closest'
         )
         return fig
+
+
+    @app.callback(
+        Output('link', 'children'),
+        [Input('scatter-plot', 'clickData')]
+    )
+    def display_link(clickData):
+        if clickData:
+            # 클릭한 포인트의 텍스트 (국회의원 이름)
+            lawmaker_name = clickData['points'][0]['text']
+            # URL 생성
+            url = f"https://assembly101.kr/{lawmaker_name}"
+            # HTML 링크 반환
+            return html.A(f"Go to {lawmaker_name}'s page", href=url, target='_blank')
+        return "Click on a point to view details."
+
 
     app.run_server(debug=True)
