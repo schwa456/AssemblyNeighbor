@@ -122,6 +122,13 @@ if __name__ == '__main__':
             xaxis_title="X축",
             yaxis_title="Y축",
             legend_title="정당",
+            legend=dict(
+                orientation='h',
+                yanchor='bottom',
+                y=1.02,
+                xanchor='center',
+                x=0.5
+            ),
             hovermode='closest'
         )
         return fig
