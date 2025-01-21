@@ -32,7 +32,13 @@ if __name__ == '__main__':
             type='text',
             placeholder='이름을 입력하세요',
             debounce=True,
-            style={'width' : '100%', 'padding': '10px', 'margin-bottom' : '20px'},
+            style={
+                'width' : '100%',
+                'maxWidth': '600px',
+                'padding': '10px',
+                'margin-bottom' : '20px',
+                'boxSizing':'border-box',
+            }
         ),
         dcc.Graph(id='scatter-plot',
                   style={
