@@ -68,19 +68,19 @@ if __name__ == '__main__':
 
     # Dash Layout Setting
     app.layout = html.Div([
-        html.H1("Visualization of Lawmakers Voting Embeddings"),
-        html.Label("Search for a lawmaker:"),
+        html.H1("제22대 국회 본회의 안건 투표에 따른 국회의원 유사도"),
+        html.Label("국회의원 이름 검색:"),
         dcc.Input(
             id='search-input',
             type='text',
-            placeholder='Enter Lawmaker Name',
+            placeholder='이름을 입력하세요',
             debounce=True
         ),
         dcc.Graph(id='scatter-plot'),
         daq.BooleanSwitch(
             id='toggle-text',
             on=True,
-            label='Show Text',
+            label='이름 보이기',
             labelPosition='top'
         ),
         dcc.Location(id='url', refresh=True),  # 리디렉션을 위한 Location 컴포넌트
@@ -121,7 +121,7 @@ if __name__ == '__main__':
             color='party',
             opacity=df['opacity'],
             color_discrete_map=color_discrete_map,
-            title="Visualization of Lawmakers Voting Embeddings"
+            title="제22대 국회 본회의 안건 투표에 따른 국회의원 유사도"
         )
 
         for i, trace in enumerate(fig.data):
@@ -140,9 +140,9 @@ if __name__ == '__main__':
             textposition='top center' if show_text else None,
         )
         fig.update_layout(
-            xaxis_title="Dim1",
-            yaxis_title="Dim2",
-            legend_title="Political Party",
+            xaxis_title="X축",
+            yaxis_title="Y축",
+            legend_title="정당",
             hovermode='closest'
         )
         return fig
