@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     # Dash Layout Setting
     app.layout = html.Div([
-        html.H1("제22대 국회 본회의 안건 투표에 따른 국회의원 유사도", style={'textAlign': 'center'}),
+        html.H1("제22대 국회 의견 지형", style={'textAlign': 'center'}),
         html.Label("국회의원 이름 검색:", style={'margin': '10px 0'}),
         dcc.Input(
             id='search-input',
@@ -34,7 +34,7 @@ if __name__ == '__main__':
             debounce=True,
             style={
                 'width' : '100%',
-                'maxWidth': '600px',
+                'maxWidth': '2000px',
                 'padding': '10px',
                 'margin-bottom' : '20px',
                 'boxSizing':'border-box',
@@ -93,7 +93,7 @@ if __name__ == '__main__':
             color='party',
             opacity=df['opacity'],
             color_discrete_map=color_discrete_map,
-            title="제22대 국회 본회의 안건 투표에 따른 국회의원 유사도"
+            title="제22대 국회의원 성향 지형"
         )
 
         for i, trace in enumerate(fig.data):
@@ -113,8 +113,8 @@ if __name__ == '__main__':
         )
         fig.update_layout(
             autosize=True,
-            margin=dict(l=10, r=10, t=30, b=10),
-            height=400,
+            margin=dict(l=10, r=10, t=70, b=10),
+            height=500,
             hoverlabel=dict(
                 font_size=12,
                 bgcolor='white',
@@ -125,11 +125,18 @@ if __name__ == '__main__':
             legend=dict(
                 orientation='h',
                 yanchor='bottom',
-                y=1.02,
+                y=-0.5,
                 xanchor='center',
                 x=0.5
             ),
-            hovermode='closest'
+            hovermode='closest',
+            title=dict(
+                text="제22대 국회 의견 지형",
+                yanchor='top',
+                y=0.95,
+                xanchor='center',
+                x=0.5,
+            )
         )
         return fig
 
@@ -173,5 +180,9 @@ if __name__ == '__main__':
         return "Click on a point to view details."
     """
 
+
     port = int(os.environ.get('PORT', 10000))
     app.run_server(host='0.0.0.0', port=port, debug=True)
+    """
+    app.run_server(debug=True)
+    """
