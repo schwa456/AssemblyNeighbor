@@ -49,13 +49,33 @@ if __name__ == '__main__':
                   }),
         daq.BooleanSwitch(
             id='toggle-text',
-            on=True,
+            on=False,
             label='이름 보이기',
             labelPosition='top',
             style={'margin': '20px 0', 'textAlign': 'center'},
         ),
-        dcc.Location(id='url', refresh=True),  # 리디렉션을 위한 Location 컴포넌트
-        html.Div(id='link', style={'margin-top': '20px'})  # 동적 링크 표시
+        dcc.Markdown(
+            """
+            ### 사용 방법
+            1. **이름 검색**: 검색창에 제22대 국회의원의 이름을 입력하면 해당 의원의 의견 지형 상의 위치를 파악할 수 있습니다.
+            2. **이름 보이기**: 이름 보이기 스위치를 사용하여 국회의원의 이름을 보이거나/보이지 않게 설정할 수 있습니다. 모바일 환경에서는 각 점을 터치하면 이름을 알 수 있습니다.
+            3. **범례**: 범례의 정당 이름을 터치하면 정당별로 점을 보이거나/보이지 않게 설정할 수 있습니다.
+            4. **그래프 해석**: 그래프의 X축과 Y축은 어떤 의미를 나타내지 **않습니다!!!!** 비슷한 의견을 가진 국회의원들끼리 모여있다고 생각해주세요.
+            
+            #### 주의사항
+            - 검색창 입력 시 철자가 정확해야 검색결과가 표시됩니다.
+            - 태블릿 환경에서는 화면을 가로로 회전하면 더 편하게 보실 수 있습니다.
+            """,
+            style={
+                'padding': '20px',
+                'backgroundColor': '#f9f9f9',
+                'border': '1px solid #ddd',
+                'borderRadius': '5px',
+                'marginTop': '20px',
+            }
+        )
+        #dcc.Location(id='url', refresh=True),  # 리디렉션을 위한 Location 컴포넌트
+        #html.Div(id='link', style={'margin-top': '20px'})  # 동적 링크 표시
     ])
 
     # Plotly 그래프 업데이트 콜백
