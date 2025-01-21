@@ -3,8 +3,8 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import plotly.express as px
 import dash
-from dash import dcc
-from dash import html
+from dash import dcc, html, Input, Output
+import dash_daq as daq
 
 class VotingData:
     def __init__(self, file_path):
@@ -46,9 +46,6 @@ class DimensionReducer:
             raise ValueError
         return reducer.fit_transform(data)
 
-app = dash.Dash(__name__)
-
-
 class Visualizer:
     def __init__(self, embedding, metadata):
         self.embedding = embedding
@@ -78,7 +75,7 @@ class Visualizer:
             dragmode='zoom',
             hovermode='closest',
             showlegend=True,
-            legend_title='Toggle Party',
+            legend_title='Political Party',
             updatemenus=[
                 {
                     "buttons": [
@@ -114,45 +111,89 @@ if __name__ == '__main__':
         '개혁신당': '#ff4d00',
         '조국혁신당': '#06275e',
         '사회민주당': '#f58400',
-        '기본소득당': '#00D2C3',
+        '기본소득당': '#008B7E',
         '무소속': 'grey',
     }
+
+    app = dash.Dash(__name__)
 
     # Dash Layout Setting
     app.layout = html.Div([
         html.H1("Visualization of Lawmakers Voting Embeddings"),
-        dcc.Graph(
-            id='scatter-plot',
-            figure={
-                'data': [
-                    {
-                        'x' : df[df['party'] == party]['Dim1'],
-                        'y' : df[df['party'] == party]['Dim2'],
-                        'text' : df[df['party'] == party]['name'],
-                        'mode' : 'maekers+text',
-                        'marker' : {
-                            'size' : 10,
-                            'color': color_discrete_map[party]
-                        },
-                        'name' : party,
-                        'textposition' : 'top center'
-                    } for party in color_discrete_map.keys()
-                ],
-                'layout': {
-                    'xaxis' : {'title' : 'Dim1'},
-                    'yaxis' : {'title' : 'Dim2'},
-                    'hovermode' : 'closest',
-                    'legend' : {'title' : 'Political Party'},
-                }
-            }
+        html.Label("Search for a lawmaker:"),
+        dcc.Input(
+            id='search-input',
+            type='text',
+            placeholder='Enter Lawmaker Name',
+            debounce=True
+        ),
+        dcc.Graph(id='scatter-plot'),
+        daq.BooleanSwitch(
+            id='toggle-text',
+            on=True,
+            label='Show Text',
+            labelPosition='top'
         )
     ])
 
+    @app.callback(
+        Output('scatter-plot', 'figure'),
+        [Input('toggle-text', 'on'),
+         Input('search-input', 'value')]
+    )
+    def update_scatter(show_text, search_name):
+        df['opacity'] = 1.0
 
+        if search_name:  # 검색어가 입력된 경우
+            # 입력값 전처리
+            search_name = search_name.strip().lower()  # 공백 제거 및 소문자 변환
 
-    # Visualization
-    party_info = voting_data.get_party_info()
-    visualizer = Visualizer(embedding, party_info)
-    visualizer.plot()
+            # 매칭 디버깅 로그
+            print(f"Search Name (processed): {search_name}")
+
+            # 이름과 비교하여 투명도 설정
+            def match_name(row_name):
+                row_name_processed = row_name.strip().lower()
+                is_match = search_name == row_name_processed
+                print(f"Matching: {row_name_processed} == {search_name} -> {is_match}")
+                return 1.0 if is_match else 0.2
+
+            df['opacity'] = df['name'].apply(match_name)
+            for _, row in df.iterrows():
+                print(f"name : {row['name']}, opacity : {row['opacity']}")
+        fig = px.scatter(
+            df,
+            x='Dim1',
+            y='Dim2',
+            text='name' if show_text else None,
+            hover_name='name',
+            color='party',
+            opacity=df['opacity'],
+            color_discrete_map=color_discrete_map,
+            title="Visualization of Lawmakers Voting Embeddings"
+        )
+
+        for i, trace in enumerate(fig.data):
+            party_data = df[df['party'] == trace.name]
+            fig.data[i].marker.opacity = party_data['opacity'].tolist()
+
+        for trace in fig.data:
+            if trace.name in ['국민의힘', '개혁신당']:  # 테두리를 추가할 정당
+                trace.marker.line = {
+                    'color': 'black',  # 테두리 색상
+                    'width': 2  # 테두리 두께
+                }
+
+        fig.update_traces(
+            mode='markers+text' if show_text else 'markers',
+            textposition='top center' if show_text else None,
+        )
+        fig.update_layout(
+            xaxis_title="Dim1",
+            yaxis_title="Dim2",
+            legend_title="Political Party",
+            hovermode='closest'
+        )
+        return fig
 
     app.run_server(debug=True)
