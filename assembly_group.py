@@ -146,6 +146,8 @@ if __name__ == '__main__':
                 font_size=12,
                 bgcolor='white',
             ),
+            xaxis_title="",
+            yaxis_title="",
             legend_title="정당",
             legend=dict(
                 orientation='h',
